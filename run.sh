@@ -66,6 +66,14 @@ echo "$vpn_name"
 
 # CA Cert contents
 # /home/<user>/.cert/nm-openvpn/<
+
+# Check vpn cert path exists or create
+CA_PATH="/home/$USER/.cert/nm-openvpn"
+if [[ ! -d "$CA_PATH" ]]; then
+	echo "CA Path does not exist at $CA_PATH - Creating..."
+	mkdir -p $CA_PATH
+fi
+
 ca_key_contents="$(sed -n "/<ca>/,/<\/ca>/p" "$selected_filename" | sed '1d;$d')"
 export CONNECTION_CA_PATH=/home/"$USER"/.cert/nm-openvpn/"$vpn_name"-ca.pem
 echo "$ca_key_contents" > "$CONNECTION_CA_PATH"
