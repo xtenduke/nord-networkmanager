@@ -6,6 +6,7 @@ Avoid downloading NordVPN client
 Tested on:
 - Fedora 37 - Gnome 43 - nmcli 1.40.2-1.fc37
 - Fedora 38 - Gnome 44.3 - nmcli 1.42.8-1.fc38
+- Fedora 39 - Gnome 45 - nmcli 1.44.2-1.fc39
 
 ### Installing
 Download the install script from [here](https://raw.githubusercontent.com/xtenduke/nord-networkmanager/main/install.sh)
