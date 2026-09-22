@@ -4,22 +4,14 @@ uuid=$CONNECTION_UUID
 type=vpn
 
 [vpn]
-auth=$CONNECTION_AUTH
 ca=$CONNECTION_CA_PATH
-cipher=${CONNECTION_CA_CIPHER}
-comp-lzo=no-by-default
 connection-type=password
 dev=tun
-mssfix=1450
 password-flags=1
-ping=15
-ping-restart=0
 remote=$CONNECTION_IPPORT
 remote-cert-tls=server
-remote-random=yes
 reneg-seconds=0
 username=$NORDVPN_USERNAME
-tunnel-mtu=1500
 verify-x509-name=subject:$CONNECTION_CA_NAME
 service-type=org.freedesktop.NetworkManager.openvpn
 $CONNECTION_VARIANT_LINES

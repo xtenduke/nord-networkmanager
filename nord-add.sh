@@ -110,6 +110,34 @@ else
 ta-dir=1"
 fi
 
+add_line() {
+    variant_lines="$variant_lines
+$1"
+}
+
+map_directive() {
+    local directive="$1" nm_key="$2" value
+    value="$(sed -n "s/^$directive //p" "$selected_filename" | head -1)"
+    if [[ -n "$value" ]]; then
+        add_line "$nm_key=$value"
+    fi
+}
+
+map_directive auth auth
+map_directive cipher cipher
+map_directive tun-mtu tunnel-mtu
+map_directive mssfix mssfix
+map_directive ping ping
+map_directive ping-restart ping-restart
+
+if grep -q "^remote-random" "$selected_filename"; then
+    add_line "remote-random=yes"
+fi
+
+if grep -q "^comp-lzo" "$selected_filename"; then
+    add_line "comp-lzo=no-by-default"
+fi
+
 export CONNECTION_VARIANT_LINES="$variant_lines"
 
 if [ -z "$NORDVPN_USERNAME" ]; then
@@ -119,11 +147,9 @@ fi
 
 export CONNECTION_ID="$vpn_name"
 export CONNECTION_UUID=$(uuidgen)
-export CONNECTION_AUTH="$(sed -n 's/^auth //p' $selected_filename)"
-export CONNECTION_CA_CIPHER="$(sed -n 's/^cipher //p' $selected_filename)"
 # Flatten remote
 export CONNECTION_IPPORT="$(sed -n 's/^remote //p' "$selected_filename" | tr -s ' ' ':' | paste -sd ' ' -)"
-export CONNECTION_CA_NAME="$(sed -n 's/^verify-x509-name //p' $selected_filename)"
+export CONNECTION_CA_NAME="$(sed -n 's/^verify-x509-name //p' "$selected_filename")"
 
 cd $START_DIR
 CONFIG_FILE_PATH="$NETWORKMANAGER_PATH/$CONNECTION_ID-$CONNECTION_UUID.nmconnection"
