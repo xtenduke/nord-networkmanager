@@ -121,7 +121,8 @@ export CONNECTION_ID="$vpn_name"
 export CONNECTION_UUID=$(uuidgen)
 export CONNECTION_AUTH="$(sed -n 's/^auth //p' $selected_filename)"
 export CONNECTION_CA_CIPHER="$(sed -n 's/^cipher //p' $selected_filename)"
-export CONNECTION_IPPORT="$(sed -n 's/^remote //p' $selected_filename | tr -s ' ' ':')"
+# Flatten remote
+export CONNECTION_IPPORT="$(sed -n 's/^remote //p' "$selected_filename" | tr -s ' ' ':' | paste -sd ' ' -)"
 export CONNECTION_CA_NAME="$(sed -n 's/^verify-x509-name //p' $selected_filename)"
 
 cd $START_DIR
