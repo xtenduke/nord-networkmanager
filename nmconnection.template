@@ -18,12 +18,11 @@ remote=$CONNECTION_IPPORT
 remote-cert-tls=server
 remote-random=yes
 reneg-seconds=0
-ta=$CONNECTION_AUTH_KEY_PATH
 username=$NORDVPN_USERNAME
-ta-dir=1
 tunnel-mtu=1500
 verify-x509-name=subject:$CONNECTION_CA_NAME
 service-type=org.freedesktop.NetworkManager.openvpn
+$CONNECTION_VARIANT_LINES
 
 [ipv4]
 method=auto

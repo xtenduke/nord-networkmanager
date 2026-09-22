@@ -79,11 +79,38 @@ export CONNECTION_CA_PATH=/home/"$USER"/.cert/nm-openvpn/"$vpn_name"-ca.pem
 echo "$ca_key_contents" > "$CONNECTION_CA_PATH"
 chmod 600 "$CONNECTION_CA_PATH"
 
-# Auth cert contents
-ta_key_contents="$(sed -n "/<tls-auth>/,/<\/tls-auth>/p" "$selected_filename" | sed '1d;$d')"
-export CONNECTION_AUTH_KEY_PATH=/home/"$USER"/.cert/nm-openvpn/"$vpn_name"-tls-auth.pem
-echo "$ta_key_contents" > "$CONNECTION_AUTH_KEY_PATH"
-chmod 600 "$CONNECTION_AUTH_KEY_PATH"
+if [[ -z "$ca_key_contents" ]]; then
+    echo "Could not extract a <ca> block from $selected_filename" >&2
+    exit 1
+fi
+
+# TLS key contents
+# Configs ending in _2.6 target OpenVPN 2.6 and ship a <tls-crypt> block.
+# The older configs ship <tls-auth>, which additionally needs a key direction.
+if grep -q "^<tls-crypt>" "$selected_filename"; then
+    tls_mode="tls-crypt"
+else
+    tls_mode="tls-auth"
+fi
+
+tls_key_contents="$(sed -n "/<$tls_mode>/,/<\/$tls_mode>/p" "$selected_filename" | sed '1d;$d')"
+if [[ -z "$tls_key_contents" ]]; then
+    echo "Could not extract a <$tls_mode> block from $selected_filename" >&2
+    exit 1
+fi
+
+tls_key_path=/home/"$USER"/.cert/nm-openvpn/"$vpn_name"-"$tls_mode".pem
+echo "$tls_key_contents" > "$tls_key_path"
+chmod 600 "$tls_key_path"
+
+if [[ "$tls_mode" == "tls-crypt" ]]; then
+    variant_lines="tls-crypt=$tls_key_path"
+else
+    variant_lines="ta=$tls_key_path
+ta-dir=1"
+fi
+
+export CONNECTION_VARIANT_LINES="$variant_lines"
 
 if [ -z "$NORDVPN_USERNAME" ]; then
     read -p "Enter nordvpn service username. Or set NORDVPN_USERNAME in your env: " NORDVPN_USERNAME
