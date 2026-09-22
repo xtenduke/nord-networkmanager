@@ -127,10 +127,13 @@ export CONNECTION_CA_NAME="$(sed -n 's/^verify-x509-name //p' $selected_filename
 
 cd $START_DIR
 CONFIG_FILE_PATH="$NETWORKMANAGER_PATH/$CONNECTION_ID-$CONNECTION_UUID.nmconnection"
-touch tmp.nmconnection
-envsubst < nmconnection.template >> tmp.nmconnection
-sudo mv tmp.nmconnection "$CONFIG_FILE_PATH"
-sudo chmod 600 "$CONFIG_FILE_PATH"
-sudo chown root "$CONFIG_FILE_PATH"
+envsubst < nmconnection.template > tmp.nmconnection
+sudo install -m 600 -o root -g root tmp.nmconnection "$CONFIG_FILE_PATH"
+rm -f tmp.nmconnection
+
+if command -v restorecon > /dev/null 2>&1; then
+    sudo restorecon "$CONFIG_FILE_PATH"
+fi
+
 sudo nmcli connection load "$CONFIG_FILE_PATH"
 echo "DONE"
